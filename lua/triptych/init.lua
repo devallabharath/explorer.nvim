@@ -90,7 +90,7 @@ local function toggle_triptych(dir)
       -- wins.parent.win,
       wins.current.win,
       wins.child.win,
-      windows[4], -- backdrop
+      windows[3], -- backdrop
     }
     vim.api.nvim_set_current_win(State.opening_win)
   end
