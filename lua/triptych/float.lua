@@ -166,7 +166,7 @@ function M.create_three_floating_windows(show_numbers, relative_numbers, column_
   local screen_width = vim.o.columns
   local padding = 4
 
-  local float_widths = u.map({column_widths[1], column_widths[2]}, function(percentage)
+  local float_widths = u.map({column_widths[0], column_widths[1]}, function(percentage)
     local max = math.floor(max_total_width * percentage)
     local result = math.min(math.floor((screen_width * percentage)) - padding, max)
     return result
