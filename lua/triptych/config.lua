@@ -35,7 +35,7 @@ local function default_config()
         directory_icon = '',
         fallback_file_icon = '',
       },
-      column_widths = { 0.25, 0.25, 0.5 },
+      column_widths = { 0.4, 0.6 },
       highlights = {
         file_names = 'NONE',
         directory_names = 'NONE',
