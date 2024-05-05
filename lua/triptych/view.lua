@@ -335,10 +335,6 @@ function M.set_parent_or_primary_window_lines(State, path_details, win_type, Dia
     local buf_line_count = vim.api.nvim_buf_line_count(buf)
     vim.api.nvim_win_set_cursor(0, { math.min(line_number, buf_line_count), 0 })
     State.windows.current.contents = contents
-  elseif win_type == 'parent' then
-    local line_number = line_number_of_path(path_details.path, contents.children)
-    vim.api.nvim_win_set_cursor(state.win, { line_number, 0 })
-    State.windows.parent.contents = contents
   end
 end
 

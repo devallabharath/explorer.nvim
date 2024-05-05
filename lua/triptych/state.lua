@@ -9,10 +9,10 @@ function TriptychState.new(config, opening_win)
 
   instance.show_hidden = config.options.show_hidden
   instance.windows = {
-    parent = {
-      path = '',
-      win = -1,
-    },
+    -- parent = {
+    --   path = '',
+    --   win = -1,
+    -- },
     current = {
       previous_path = '',
       win = -1,

@@ -207,7 +207,7 @@ function M.create_three_floating_windows(show_numbers, relative_numbers, column_
     table.insert(wins, win)
   end
 
-  -- Focus the middle window
+  -- Focus the first window
   vim.api.nvim_set_current_win(wins[1])
 
   if backdrop < 100 and vim.o.termguicolors then
