@@ -65,10 +65,10 @@ local function toggle_triptych(dir)
     current = {
       path = '',
       previous_path = '',
-      win = windows[2],
+      win = windows[1],
     },
     child = {
-      win = windows[3],
+      win = windows[2],
       is_dir = false,
     },
   }
