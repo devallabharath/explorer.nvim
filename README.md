@@ -1,0 +1,176 @@
+<!-- panvimdoc-ignore-start -->
+<h1 align="center">Triptych.nvim</h1>
+
+<p align="center">Directory browser for Neovim, inspired by <a href="https://github.com/ranger/ranger">Ranger</a></p>
+
+![Triptych screenshot](screenshot.jpg?raw=true "Triptych screenshot")
+
+[![CI](https://github.com/simonmclean/triptych.nvim/actions/workflows/ci.yml/badge.svg)](https://github.com/simonmclean/triptych.nvim/actions/workflows/ci.yml)
+
+<!-- panvimdoc-ignore-end -->
+
+<!-- panvimdoc-include-comment ## How it works -->
+
+The UI consists of 3 floating windows. In the center is the currently focused directory. On the left is the parent directory.
+The right window contains either a child directory, or a file preview.
+
+With default bindings use `j` and `k` (or any other motions like `G`,  `gg`, `/` etc) to navigate within the current directory.
+Use `h` and `l` to switch to the parent or child directories respectively.
+If the buffer on the right is a file, then pressing `l` will close Triptych and open that file in the buffer you were just in.
+You only ever control or focus the middle window.
+
+## ✨ Features
+
+- Rapid, intuitive directory browsing
+- File preview
+- Devicons support
+- Git signs
+- Diagnostic signs
+- Perform common actions on the filesystem
+    - Rename
+    - Delete (including bulk)
+    - Copy 'n' paste (including bulk) [^1]
+    - Cut 'n' paste (including bulk) [^1]
+- Extensible
+
+[^1]: These are not currently working on the Windows operating system
+
+## ⚡️ Requirements
+
+- Neovim >= 0.9.0
+- [nvim-lua/plenary.nvim](https://github.com/nvim-lua/plenary.nvim) plugin
+- Optional, if you want fancy icons
+    - [nvim-tree/nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons) plugin
+    -  A [Nerd Font](https://www.nerdfonts.com/)
+
+## 📦 Installation
+
+Example using [Lazy](https://github.com/folke/lazy.nvim).
+
+```lua
+{
+  'simonmclean/triptych.nvim',
+  event = 'VeryLazy',
+  dependencies = {
+    'nvim-lua/plenary.nvim', -- required
+    'nvim-tree/nvim-web-devicons', -- optional
+  }
+}
+```
+
+Then call the `setup` function somewhere in your Neovim config to initialise it with the default options.
+
+```lua
+require 'triptych'.setup()
+```
+
+Launch using the `:Triptych` command, which will toggle Triptych open/closed. You may want to create a binding for this.
+
+```lua
+vim.keymap.set('n', '<leader>-', ':Triptych<CR>', { silent = true })
+```
+
+## ⚙️ Configuration
+
+Below is the default configuration. Feel free to override any of these.
+
+Key mappings can either be a string, or a table of strings if you want multiple bindings.
+
+```lua
+require 'triptych'.setup {
+  mappings = {
+    -- Everything below is buffer-local, meaning it will only apply to Triptych windows
+    show_help = 'g?',
+    jump_to_cwd = '.',  -- Pressing again will toggle back
+    nav_left = 'h',
+    nav_right = { 'l', '<CR>' }, -- If target is a file, opens the file in-place
+    open_hsplit = { '-' },
+    open_vsplit = { '|' },
+    open_tab = { '<C-t>' },
+    cd = '<leader>cd',
+    delete = 'd',
+    add = 'a',
+    copy = 'c',
+    rename = 'r',
+    cut = 'x',
+    paste = 'p',
+    quit = 'q',
+    toggle_hidden = '<leader>.',
+  },
+  extension_mappings = {},
+  options = {
+    dirs_first = true,
+    show_hidden = false,
+    line_numbers = {
+      enabled = true,
+      relative = false,
+    },
+    file_icons = {
+      enabled = true,
+      directory_icon = '',
+      fallback_file_icon = ''
+    },
+    column_widths = { .25, .25, .5 }, -- Must add up to 1 after rounding to 2 decimal places
+    highlights = { -- Highlight groups to use. See `:highlight` or `:h highlight`
+      file_names = 'NONE',
+      directory_names = 'NONE',
+    },
+    syntax_highlighting = { -- Applies to file previews
+      enabled = true,
+      debounce_ms = 100,
+    },
+    backdrop = 60 -- Backdrop opacity. 0 is fully opaque, 100 is fully transparent (disables the feature)
+  },
+  git_signs = {
+    enabled = true,
+    signs = {
+      -- The value can be either a string or a table.
+      -- If a string, will be basic text. If a table, will be passed as the {dict} argument to vim.fn.sign_define
+      -- If you want to add color, you can specify a highlight group in the table.
+      add = '+',
+      modify = '~',
+      rename = 'r',
+      untracked = '?',
+    },
+  },
+  diagnostic_signs = {
+    enabled = true,
+  }
+}
+```
+
+## Extending functionality
+
+The `extension_mappings` property allows you add any arbitrary functionality based on the current cursor target.
+You simply provide a key mapping, a vim mode, and a function. When the mapped keys are pressed the function is invoked, and will receive a table containing the following:
+
+```lua
+{
+  dirname, -- e.g. /User/Name/foo
+  display_name -- same as basename
+  filetype, -- e.g. 'javascript'
+  is_dir, -- boolean indicating whether this is a directory
+  path, -- e.g. /User/Name/foo/bar.js
+}
+```
+
+### Examples
+
+#### Telescope integration
+
+If you want to make `<c-f>` search the file or directory under the cursor using [Telescope](https://github.com/nvim-telescope/telescope.nvim) try something like:
+
+```lua
+{
+  extension_mappings = {
+    ['<c-f>'] = {
+      mode = 'n',
+      fn = function(target)
+        require 'telescope.builtin'.live_grep {
+          search_dirs = { target.path }
+        }
+      end
+    }
+  }
+}
+```
